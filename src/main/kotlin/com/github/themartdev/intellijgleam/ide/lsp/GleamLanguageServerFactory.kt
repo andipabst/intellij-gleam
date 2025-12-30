@@ -3,12 +3,17 @@ package com.github.themartdev.intellijgleam.ide.lsp
 import com.intellij.openapi.project.Project
 import com.redhat.devtools.lsp4ij.LanguageServerEnablementSupport
 import com.redhat.devtools.lsp4ij.LanguageServerFactory
+import com.redhat.devtools.lsp4ij.client.LanguageClientImpl
 import com.redhat.devtools.lsp4ij.client.features.LSPClientFeatures
 import com.redhat.devtools.lsp4ij.server.StreamConnectionProvider
 
 class GleamLanguageServerFactory : LanguageServerFactory, LanguageServerEnablementSupport {
     override fun createConnectionProvider(project: Project): StreamConnectionProvider {
         return GleamLanguageServer(project)
+    }
+
+    override fun createLanguageClient(project: Project): LanguageClientImpl {
+        return GleamLanguageClient(project)
     }
 
     override fun isEnabled(project: Project): Boolean {

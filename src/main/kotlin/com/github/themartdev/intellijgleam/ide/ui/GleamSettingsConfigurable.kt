@@ -12,11 +12,18 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
+import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.ButtonsGroup
+import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.bind
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.builder.toMutableProperty
 import com.redhat.devtools.lsp4ij.LanguageServerManager
+import kotlin.reflect.KMutableProperty0
 
 class GleamSettingsConfigurable(private val project: Project) :
     BoundConfigurable(GleamBundle.message("gleam.settings.configurable.title")), Configurable {
@@ -49,9 +56,10 @@ class GleamSettingsConfigurable(private val project: Project) :
 
         }
         group(GleamBundle.message("gleam.settings.configurable.group.lsp")) {
+            lateinit var languageServerEnabledRadioButton: Cell<JBRadioButton>
             buttonsGroup {
                 row {
-                    radioButton(
+                    languageServerEnabledRadioButton = radioButton(
                         GleamBundle.message("gleam.settings.lsp.configurable.lsp.enabled"), GleamLspMode.ENABLED
                     ).comment(GleamBundle.message("gleam.settings.lsp.configurable.lsp.enabled.help"))
                 }
@@ -63,6 +71,24 @@ class GleamSettingsConfigurable(private val project: Project) :
             }.apply {
                 bind(settings::lspMode)
             }
+
+            group(GleamBundle.message("gleam.settings.lsp.configurable.headline")) {
+                row {
+                    checkBox(GleamBundle.message("gleam.settings.lsp.configurable.inlayHints.pipelines"))
+                        .comment(GleamBundle.message("gleam.settings.lsp.configurable.inlayHints.pipelines.help"))
+                        .bindSelected(settings::showInlayHintsPipelines)
+                }
+                row {
+                    checkBox(GleamBundle.message("gleam.settings.lsp.configurable.inlayHints.functionParameterTypes"))
+                        .comment(GleamBundle.message("gleam.settings.lsp.configurable.inlayHints.functionParameterTypes.help"))
+                        .bindSelected(settings::showInlayHintsFunctionParameterTypes)
+                }
+                row {
+                    checkBox(GleamBundle.message("gleam.settings.lsp.configurable.inlayHints.functionReturnTypes"))
+                        .comment(GleamBundle.message("gleam.settings.lsp.configurable.inlayHints.functionReturnTypes.help"))
+                        .bindSelected(settings::showInlayHintsFunctionReturnTypes)
+                }
+            }.enabledIf(languageServerEnabledRadioButton.selected)
         }
     }
 
